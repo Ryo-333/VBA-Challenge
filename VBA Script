@@ -1,0 +1,70 @@
+Sub FindUniquestocks()
+    Dim num As Double
+    Dim stockvalue As Double
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim ticker As String ' Changed from Double to String
+    Dim openingprice As Double
+    Dim closingprice As Double
+    Dim yearlychange As Double ' Added variable declaration
+    Dim percentchange As Double
+    Dim cellnumber As Integer
+    Dim openindex As Long
+    Dim greatestincrease As Double
+    Dim greatestincreaseticker As String
+    Dim greatestdecrease As Double
+    Dim greatestdecreaseticker As String
+    Dim greatestvolume As Double
+    Dim greatestvolumeticker As String
+
+    ' Loop through all worksheets
+    For Each ws In Worksheets
+        ws.Activate
+
+        lastRow = Cells(Rows.Count, 1).End(xlUp).Row
+
+        rownum = 2
+        stockvalue = 0
+        cellnumber = 2
+        openindex = 2
+        greatestincrease = 0
+        greatestdecrease = 0
+        greatestvolume = 0
+
+        For i = 2 To lastRow
+            ' Formula for total stocks per ticker
+            stockvalue = stockvalue + Cells(i, 7).Value
+            ' If statements to find values in each column
+            If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+                ticker = Cells(i, 1).Value
+                openingprice = Cells(openindex, 3).Value
+                closingprice = Cells(i, 6).Value
+                yearlychange = closingprice - openingprice
+                percentchange = yearlychange / openingprice
+
+                Cells(rownum, 9).Value = ticker
+                Cells(rownum, 10).Value = yearlychange
+                Cells(rownum, 11).Value = percentchange
+                Cells(rownum, 12).Value = stockvalue
+                ' Looking for Max and Min
+                If percentchange > greatestincrease Then
+                    greatestincrease = percentchange
+                    greatestincreaseticker = ticker
+                End If
+                If percentchange < greatestdecrease Then
+                    greatestdecrease = percentchange
+                    greatestdecreaseticker = ticker
+                End If
+                If stockvalue > greatestvolume Then
+                    greatestvolume = stockvalue
+                    greatestvolumeticker = ticker
+                End If
+                ' Reset at each if
+                num = num + 1
+                openindex = i + 1
+                stockvalue = 0
+                rownum = rownum + 1 ' Increment rownum for the next entry
+            End If
+        Next i
+    Next ws
+End Sub
